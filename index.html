@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taylor's Side Projects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one left-aligned column, a workbench log. Header, how-I-build strip, then project entries as rows with a side rail of facts. */
+:root{
+  --bg:#EEF1F4; --surface:#FFFFFF; --ink:#141A26; --muted:#5A6476; --line:#D3D9E2;
+  --accent:#2F4BD8; --accent-soft:#E2E7FB; --live:#1F7A4D;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E131D; --surface:#161D2B; --ink:#E6EAF2; --muted:#9AA4B8; --line:#2A3346;
+  --accent:#93A6FF; --accent-soft:#1E2852; --live:#5FD39A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E131D; --surface:#161D2B; --ink:#E6EAF2; --muted:#9AA4B8; --line:#2A3346;
+  --accent:#93A6FF; --accent-soft:#1E2852; --live:#5FD39A; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;margin:0}
+.wrap{max-width:980px;margin:0 auto;padding-inline:20px;padding-block:56px 72px;display:grid;gap:56px}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header{display:grid;gap:18px}
+h1{font-size:clamp(40px,7vw,68px);font-weight:700;letter-spacing:-.02em}
+h1 span{color:var(--accent)}
+.lede{max-width:62ch;font-size:19px;margin:0}
+.links{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:var(--mono);font-size:14px}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.how div{background:var(--surface);padding:18px 20px;display:grid;gap:6px;align-content:start}
+.how h3{font-size:17px;font-weight:500}
+.how p{margin:0;font-size:15px;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:12px}
+h2{font-size:30px;font-weight:700}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.filters button{font:500 13px var(--mono);color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.list{display:grid;border-top:2px solid var(--ink)}
+.proj{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:16px 40px;padding-block:30px;border-bottom:1px solid var(--line)}
+.proj > *{min-width:0}
+.proj h3{font-size:26px;font-weight:700;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.proj h3 small{font:400 13px var(--mono);color:var(--muted);letter-spacing:0}
+.proj p{margin:10px 0 0;max-width:62ch}
+.ai{margin-top:14px;padding:12px 14px;background:var(--accent-soft);border-radius:4px;font-size:15.5px}
+.ai b{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:2px}
+.facts{display:grid;gap:12px;align-content:start;font-size:14px}
+.facts div{display:grid;gap:2px}
+.facts dd{margin:0;font-family:var(--mono);font-size:13px;line-height:1.5}
+.facts dt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.status{display:inline-flex;align-items:center;gap:6px}
+.status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.status.live::before{background:var(--live)}
+footer{display:grid;gap:8px;font-size:15px;color:var(--muted)}
+footer p{margin:0;max-width:62ch}
+@media (max-width:720px){.proj{grid-template-columns:1fr}.facts{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}}
+@media (prefers-reduced-motion:no-preference){.proj{transition:opacity .2s}}
+.clip{grid-column:1/-1;margin:0;aspect-ratio:16/10;max-width:100%;background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:grid;place-items:center}
+.clip video{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.tbd{color:var(--muted);font-style:italic}
+.clip.todo{border-style:dashed;padding:20px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:13px;aspect-ratio:auto;min-height:140px}
+@media (max-width:720px){.clip.todo{min-height:96px}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <span class="label">Side projects · built with AI agents</span>
+  <h1>Taylor Earl<span>.</span></h1>
+  <p class="lede">I'm a backend engineer at Tixr by day. At night I build small apps for my family, my house, and whatever I'm curious about that week, almost all of them with AI coding agents doing a lot of the typing. This is the running list.</p>
+  <nav class="links" aria-label="Elsewhere">
+    <a href="https://www.linkedin.com/in/taylorjearl">LinkedIn</a>
+    <a href="https://github.com/soccerdude288">GitHub</a>
+  </nav>
+</header>
+
+<section class="how" aria-label="How I build">
+  <div><span class="label">Spec first</span><h3>Write it down, then build it</h3><p>Every project starts with a spec, a glossary, or a plan file that lives in the repo, so the agent and I agree on what we're making.</p></div>
+  <div><span class="label">Agents as a system</span><h3>Rules, skills, and hooks</h3><p>Each repo carries an AGENTS.md or CLAUDE.md, reusable skills, and guardrails, so any session can pick the work back up.</p></div>
+  <div><span class="label">Prove it</span><h3>Tests and evals</h3><p>Unit tests, recorded sample inputs, and end-to-end runs decide when something is done, not the chat.</p></div>
+</section>
+
+<section aria-labelledby="projects-h" style="display:grid;gap:20px">
+  <div class="bar">
+    <h2 id="projects-h">Projects</h2>
+    <div class="filters" role="group" aria-label="Filter projects">
+      <button type="button" id="f-all" data-f="all" aria-pressed="true">All</button>
+      <button type="button" id="f-ai" data-f="ai" aria-pressed="false">AI features</button>
+      <button type="button" id="f-apple" data-f="apple" aria-pressed="false">Apple</button>
+      <button type="button" id="f-android" data-f="android" aria-pressed="false">Android</button>
+      <button type="button" id="f-web" data-f="web" aria-pressed="false">Web</button>
+      <button type="button" id="f-tools" data-f="tools" aria-pressed="false">Tooling</button>
+    </div>
+  </div>
+
+  <div class="list">
+    <article class="proj" data-tags="ai web apple">
+      <div>
+        <h3>ink. <small>tattoo sleeve planner · web + iOS</small></h3>
+        <p>Plan a full tattoo sleeve on a to-scale 3D model of your own arm. Place and resize pieces right on the arm, generate or upload flash art, and break the whole thing into sittings with hour and cost estimates. It started on the web, and the native iPhone app (SwiftUI and SceneKit) shares the same backend, with touch controls for orbiting the arm and sliding, pinching and twisting pieces on the skin.</p>
+        <div class="ai"><b>Where the AI is</b>An assistant chat proposes designs, image models generate the flash, and a vision model turns reference photos into a description the image model can use. A photo-to-linework mode keeps the likeness of a real person or pet.</div>
+      </div>
+      <dl class="facts">
+        <div><dt>Status</dt><dd class="status live">Live on the web, TestFlight on iPhone</dd></div>
+        <div><dt>Stack</dt><dd>React, Three.js, Vercel, SwiftUI, SceneKit, OpenAI + FLUX image models</dd></div>
+        <div><dt>Link</dt><dd><a href="https://tattoo-planner.vercel.app">tattoo-planner.vercel.app</a></dd></div>
+      </dl>
+    </article>
+
+    <article class="proj" data-tags="ai apple">
+      <div>
+        <h3>Doll Dressup <small>iPad dress-up studio for kids</small></h3>
+        <p>A no-reading-required iPad app for kids 4 to 8. Each kid gets a profile and a collection of dolls to design, dress, pose in scenes, and snap in a photo booth with stickers.</p>
+        <div class="ai"><b>Where the AI is</b>The doll art and outfit layers are generated with image models, then gated twice: a script checks the geometry of every layer, and a vision model role-plays a strict 6-year-old judge to catch muddy backgrounds, melted eyes and other things kids notice.</div>
+      </div>
+      <dl class="facts">
+        <div><dt>Status</dt><dd class="status">In progress</dd></div>
+        <div><dt>Stack</dt><dd>SwiftUI (iPadOS), Python art pipeline, OpenAI + Gemini image models</dd></div>
+      </dl>
+    </article>
+
+
+    <article class="proj" data-tags="ai tools">
+      <div>
+        <h3>Kroger MCP <small>groceries for agents</small></h3>
+        <p>My fork of the open-source kroger-mcp server, which lets AI agents search Kroger stores and products and manage a cart. I added an enriched cart view with live prices and stock, unit-price math that handles bulk and weight-sold items, and tools that suggest cheaper or in-stock substitutes for the whole cart. I also fixed token handling that was making 3 to 4 extra API calls per request.</p>
+        <div class="ai"><b>Where the AI is</b>Agents use it as hands: plan meals in chat and turn them into a priced grocery cart.</div>
+      </div>
+      <dl class="facts">
+        <div><dt>Status</dt><dd class="status live">Daily use</dd></div>
+        <div><dt>Stack</dt><dd>Python, FastMCP, Kroger API</dd></div>
+      </dl>
+    </article>
+
+    <article class="proj" data-tags="apple">
+      <div>
+        <h3>Doodleland <small>iPad coloring for kids</small></h3>
+        <p>A landscape iPad coloring app for kids 4 to 8. Little mode keeps paint inside the lines, Big mode is free drawing, and a grown-up math gate sits between them. Kids can also turn a photo into a coloring page, and a mascot named Pip cheers them on.</p>
+        <div class="ai"><b>How agents built it</b>Rebuilt from a design prototype, then put through agent polish reviews that judge every screen as a young kid would. 60 unit and UI tests run on the simulator.</div>
+      </div>
+      <dl class="facts">
+        <div><dt>Status</dt><dd class="status live">TestFlight</dd></div>
+        <div><dt>Stack</dt><dd>SwiftUI (iPadOS), Core Graphics, Apple Pencil</dd></div>
+      </dl>
+    </article>
+
+    <article class="proj" data-tags="apple android">
+      <div>
+        <h3>Finlet <small>Jellyfin for kids · iPhone, iPad, Apple TV, Android TV</small></h3>
+        <p>A Jellyfin client built for families. Kids get big posters and tap-to-play, grown-ups get a calm full-featured mode. Per-kid rating limits, offline downloads, a math gate on settings, and server discovery that just works on the home network.</p>
+        <div class="ai"><b>How agents built it</b>One SwiftUI codebase covers iPhone, iPad and Apple TV. Agents then ported it to Android TV, using the iOS app's test suite as the spec. The shared core is backed by more than 230 tests.</div>
+      </div>
+      <dl class="facts">
+        <div><dt>Status</dt><dd class="status live">On my kids' iPads</dd></div>
+        <div><dt>Stack</dt><dd>SwiftUI (iOS, iPadOS, tvOS), Kotlin + Compose for TV</dd></div>
+      </dl>
+    </article>
+
+    <article class="proj" data-tags="apple">
+      <div>
+        <h3>Photobooth <small>party kiosk</small></h3>
+        <p>An unattended iPad photo booth. It drives a Sony camera over USB, builds photo strips, prints them on a Selphy, and can record video guestbook messages through a capture card. Operator mode handles setup and export after the party.</p>
+        <div class="ai"><b>How agents built it</b>Started from a domain glossary (Event, Session, Shot, Composite) so every agent session uses the same words, plus a written operator runbook.</div>
+      </div>
+      <dl class="facts">
+        <div><dt>Status</dt><dd class="status live">TestFlight</dd></div>
+        <div><dt>Stack</dt><dd>Swift, ImageCaptureCore (PTP), AVFoundation</dd></div>
+      </dl>
+    </article>
+
+    <article class="proj" data-tags="apple">
+      <div>
+        <h3>Tracker <small>track anything, see what moves it</small></h3>
+        <p>An iPhone app for tracking anything about yourself, from mood scales to yes/no habits, and finding out what actually changes it. A stats engine runs t-tests on events, correlations between trackers, and tag and weekday patterns, then turns the confident ones into insights and a printable doctor report. Widgets and Siri logging included.</p>
+        <div class="ai"><b>How agents built it</b>Agents worked through 30 milestones from a written plan. They ported a JavaScript prototype's stats code to Swift and checked it against golden test vectors made by running the original JS. More than 600 tests keep it honest.</div>
+      </div>
+      <dl class="facts">
+        <div><dt>Status</dt><dd class="status">TestFlight prep</dd></div>
+        <div><dt>Stack</dt><dd>Swift 6, SwiftUI, SwiftData, WidgetKit, App Intents</dd></div>
+      </dl>
+    </article>
+
+    <article class="proj" data-tags="ai apple">
+      <div>
+        <h3>Shelf Scanner <small>thrift store title reader</small></h3>
+        <p>Pan your iPhone slowly along a thrift store shelf and get back a clean, de-duplicated list of the book and DVD titles on it, ready to paste into an AI chat for price research.</p>
+        <div class="ai"><b>Where the AI is</b>On-device Vision text recognition reads spines at two angles, then fuzzy matching merges the same title across frames and checks it against Open Library and TMDB. Recorded shelf pans act as evals for tuning.</div>
+      </div>
+      <dl class="facts">
+        <div><dt>Status</dt><dd class="status">Proof of concept</dd></div>
+        <div><dt>Stack</dt><dd>Swift, SwiftUI, Vision, AVFoundation</dd></div>
+      </dl>
+    </article>
+  </div>
+
+</section>
+
+<footer>
+  <span class="label">At work</span>
+  <p>At Tixr I build and maintain our internal AI dev tools, including the systems that support our development lifecycle and the automated evaluation that checks the output. That work is private, but it's where most of the habits above came from.</p>
+</footer>
+</div>
+
+<script>
+(function(){
+  var btns=document.querySelectorAll('.filters button');
+  var items=document.querySelectorAll('.proj');
+  btns.forEach(function(b){b.addEventListener('click',function(){
+    var f=b.getAttribute('data-f');
+    btns.forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+    items.forEach(function(p){p.hidden=!(f==='all'||p.getAttribute('data-tags').split(' ').indexOf(f)>-1)});
+  })});
+})();
+</script>
+</body>
+</html>
